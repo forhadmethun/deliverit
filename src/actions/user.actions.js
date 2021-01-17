@@ -5,8 +5,8 @@ import {apiError} from "../util/error.processor";
 import {UserServiceMock} from "../services/backend/mock/user.service.mock";
 import {UserServiceReal} from "../services/backend/real/user.service.real";
 
-const userService = new UserServiceMock();
-// const userService = new UserServiceReal();
+// const userService = new UserServiceMock();
+const userService = new UserServiceReal();
 
 const login = (username, password) => async dispatch => {
     dispatch({

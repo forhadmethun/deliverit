@@ -2,6 +2,7 @@ import React from "react";
 import Header from "./Header";
 import Aside from "./Aside";
 import HeaderMobile from "./HeaderMobile";
+import {userActions} from "../actions";
 function Layout(props) {
     return (
         <div>
@@ -83,7 +84,9 @@ function Layout(props) {
 									<span class="navi-text text-muted text-hover-primary">jm@softplus.com</span>
 								</span>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-light-primary font-weight-bolder py-2 px-5">Sign Out</a>
+                                <a href="#" class="btn btn-sm btn-light-primary font-weight-bolder py-2 px-5"
+                                    onClick={() => userActions.logout()}
+                                >Sign Out</a>
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,49 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Layout from "../components/Layout";
+import {useDispatch, useSelector} from "react-redux";
+import {orderActions, userActions} from "../actions";
+import $ from "jquery";
 
 function Dashboard() {
+    const order = useSelector(state => state.order);
+    const dispatch = useDispatch();
+    const [orderNumber, setOrderNumber] = useState('');
+    const [customerName, setCustomerName] = useState('');
+    const [email, setEmail] = useState('');
+    const [mobileNo, setMobileNo] = useState('');
+    const [address, setAddress] = useState('');
+    const [items, setItems] = useState('');
+
+    useEffect(() => {
+        dispatch(orderActions.findAll());
+    }, []);
+
+    if ( order?.type == "ORDER_ADD_SUCCESS" ){
+        $('.modal-body').find('form')[0].reset();
+        $('#exampleModal').hide();
+        $('.modal-backdrop').hide();
+        dispatch(orderActions.findAll());
+    }
+
+    const addOrder = () => {
+        dispatch(orderActions.add(
+            {
+                "address" : address,
+                "orderNumber": orderNumber,
+                "customer": {
+                    "name": customerName,
+                    "email": email,
+                    "mobileNo": mobileNo
+                },
+                "orderItems": [
+                    {
+                        "description": items,
+                    }
+                ]
+            }
+        ));
+    };
+
     return (
         <Layout>
             {/*begin::Dashboard*/}
@@ -15,7 +57,98 @@ function Dashboard() {
                                 <span class="card-label font-weight-bolder text-dark">New Orders</span>
                             </h3>
                             <div class="card-toolbar">
-                                    <a href="add-user.html" className="btn btn-light-primary font-weight-bold ml-2">Add Order</a>
+                                <button type="button" class="btn btn-light-primary font-weight-bold ml-2" data-toggle="modal" data-target="#exampleModal">
+                                    Add Order
+                                </button>
+
+                                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">New Order</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <i aria-hidden="true" class="ki ki-close"></i>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form className="form" id="kt_login_signin_form">
+                                                    <div className="form-group mb-5">
+                                                        <input
+                                                            className="form-control h-auto form-control-solid py-4 px-8"
+                                                            type="text"
+                                                            placeholder="Order Number"
+                                                            name="orderNumber"
+                                                            autoComplete="off"
+                                                            value={orderNumber}
+                                                            onChange={e => setOrderNumber(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="form-group mb-5">
+                                                        <input
+                                                            className="form-control h-auto form-control-solid py-4 px-8"
+                                                            type="text"
+                                                            placeholder="Customer Name"
+                                                            name="customerName"
+                                                            value={customerName}
+                                                            onChange={e => setCustomerName(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="form-group mb-5">
+                                                        <input
+                                                            className="form-control h-auto form-control-solid py-4 px-8"
+                                                            type="text"
+                                                            placeholder="Email"
+                                                            name="email"
+                                                            value={email}
+                                                            onChange={e => setEmail(e.target.value)}
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group mb-5">
+                                                        <input
+                                                            className="form-control h-auto form-control-solid py-4 px-8"
+                                                            type="text"
+                                                            placeholder="Phone"
+                                                            name="phone"
+                                                            value={mobileNo}
+                                                            onChange={e => setMobileNo(e.target.value)}
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group mb-5">
+                                                        <input
+                                                            className="form-control h-auto form-control-solid py-4 px-8"
+                                                            type="text"
+                                                            placeholder="Address"
+                                                            name="address"
+                                                            value={address}
+                                                            onChange={e => setAddress(e.target.value)}
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group mb-5">
+                                                        <input
+                                                            className="form-control h-auto form-control-solid py-4 px-8"
+                                                            type="text"
+                                                            placeholder="Order Item"
+                                                            name="item"
+                                                            value={items}
+                                                            onChange={e => setItems(e.target.value)}
+                                                        />
+                                                    </div>
+
+
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary font-weight-bold"
+                                                        onClick={() => addOrder()}
+                                                >Save changes</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {/*end::Header*/}
@@ -32,49 +165,58 @@ function Dashboard() {
                                                 <th class="p-0 w-40px text-center"> Order No</th>
                                                 <th class="p-0 min-w-200px text-center">Placed By</th>
                                                 <th class="p-0 min-w-100px text-center">Placement Time</th>
-                                                <th class="p-0 min-w-125px text-center">Pickup From</th>
+                                                {/*<th class="p-0 min-w-125px text-center">Pickup From</th>*/}
                                                 <th class="p-0 min-w-110px text-center">Delivery To</th>
-                                                <th class="p-0 min-w-110px text-center">Amount</th>
+                                                <th class="p-0 min-w-110px text-center">Item</th>
                                                 <th class="p-0 min-w-150px text-center">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td class="pl-0 py-4">
-                                                    <div class="symbol symbol-50 symbol-light mr-1">
-																				<span class="symbol-label">
-																					1001
+                                            { order?.type === "ORDER_FIND_SUCCESS" && order?.message.map(m => {
+                                                return <tr>
+                                                    <td className="pl-0 py-4">
+                                                        <div className="symbol symbol-50 symbol-light mr-1">
+																				<span className="symbol-label">
+                                                                                    {m.orderId}
 																				</span>
-                                                    </div>
-                                                </td>
-                                                <td class="pl-0">
-                                                    <a href="#"
-                                                       class="text-dark-75 font-weight-bolder text-hover-primary mb-1 font-size-lg">Sant
-                                                        Outstanding</a>
-                                                    <div>
-                                                        <span class="font-weight-bolder">Email:</span>
-                                                        <a class="text-muted font-weight-bold text-hover-primary"
-                                                           href="#">bprow@bnc.cc</a>
-                                                    </div>
-                                                </td>
-                                                <td class="text-right">
-                                                    <span class="text-dark-75 font-weight-bolder d-block font-size-lg">13.00, 25 Oct</span>
-                                                </td>
-                                                <td class="text-right">
-                                                    <span class="text-dark-75 font-weight-bolder d-block font-size-lg">Kristiine, Tallinn</span>
-                                                </td>
-                                                <td class="text-right">
+                                                        </div>
+                                                    </td>
+                                                    <td className="pl-0">
+                                                        <a href="#"
+                                                           className="text-dark-75 font-weight-bolder text-hover-primary mb-1 font-size-lg">
+                                                            {m.customer.name}
+                                                        </a>
+                                                        <div>
+                                                            <span className="font-weight-bolder">Email:</span>
+                                                            <a className="text-muted font-weight-bold text-hover-primary"
+                                                               href="#">{m.customer.email}</a>
+                                                        </div>
+                                                    </td>
+                                                    <td className="text-right">
+                                                        <span
+                                                            className="text-dark-75 font-weight-bolder d-block font-size-lg">
+                                                            {m.expectedDeliveryTime}
+                                                        </span>
+                                                    </td>
+                                                    {/*<td class="text-right">*/}
+                                                    {/*    <span class="text-dark-75 font-weight-bolder d-block font-size-lg">Kristiine, Tallinn</span>*/}
+                                                    {/*</td>*/}
+                                                    <td className="text-right">
                                                     <span
-                                                        class="text-dark-75 font-weight-bolder d-block font-size-lg">Piirita</span>
-                                                </td>
-                                                <td class="text-right">
-                                                    <span className="text-dark-75 font-weight-bolder d-block font-size-lg">€20</span>
-                                                </td>
-                                                <td class="text-center pr-0">
-                                                    <a href="#" class="btn btn-icon btn-light btn-hover-primary btn-sm">
+                                                        className="text-dark-75 font-weight-bolder d-block font-size-lg">{m.address}</span>
+                                                    </td>
+                                                    <td className="text-right">
+                                                        <span
+                                                            className="text-dark-75 font-weight-bolder d-block font-size-lg">
+                                                            {m.orderItems[0].description}
+                                                        </span>
+                                                    </td>
+                                                    <td className="text-center pr-0">
+                                                        <a href="#"
+                                                           className="btn btn-icon btn-light btn-hover-primary btn-sm">
 																				<span
                                                                                     title="Description"
-                                                                                    class="svg-icon svg-icon-md svg-icon-primary">
+                                                                                    className="svg-icon svg-icon-md svg-icon-primary">
 																					{/*begin::Svg Icon | path:/metronic/theme/html/demo1/dist/assets/media/svg/icons/General/Settings-1.svg*/}
                                                                                     <svg
                                                                                         xmlns="http://www.w3.org/2000/svg"
@@ -98,12 +240,12 @@ function Dashboard() {
 																					</svg>
                                                                                     {/*end::Svg Icon*/}
 																				</span>
-                                                    </a>
-                                                    <a href="#"
-                                                       class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3">
+                                                        </a>
+                                                        <a href="#"
+                                                           className="btn btn-icon btn-light btn-hover-primary btn-sm mx-3">
 																				<span
                                                                                     title="Assign"
-                                                                                    class="svg-icon svg-icon-md svg-icon-primary">
+                                                                                    className="svg-icon svg-icon-md svg-icon-primary">
 																					{/*begin::Svg Icon | path:/metronic/theme/html/demo1/dist/assets/media/svg/icons/Communication/Write.svg*/}
                                                                                     <svg
                                                                                         xmlns="http://www.w3.org/2000/svg"
@@ -130,10 +272,11 @@ function Dashboard() {
 																					</svg>
                                                                                     {/*end::Svg Icon*/}
 																				</span>
-                                                    </a>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            })}
 
-                                                </td>
-                                            </tr>
 
                                             </tbody>
                                         </table>
