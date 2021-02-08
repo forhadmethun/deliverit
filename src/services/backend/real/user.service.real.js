@@ -16,8 +16,7 @@ export class UserServiceReal extends UserService {
                 return response.data;
             });
     }
-    register(user){
-/*        const registrationInfo = new RegistrationInfo(
+    register(user){/*        const registrationInfo = new RegistrationInfo(
             user.firstName,
             user.lastName,
             user.company,
@@ -29,7 +28,7 @@ export class UserServiceReal extends UserService {
         );*/
         const data = user;// registrationInfo.getRequestBody();
         const requestOptions = {
-            url: `${config.apiUrl}/profile`,
+            url: `${config.apiUrl}/users`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -41,7 +40,23 @@ export class UserServiceReal extends UserService {
                 return response.data;
             });
     }
+
     logout(token) {
         localStorage.removeItem('user');
+    }
+
+    findAllDrivers() {
+        const requestOptions = {
+            url: `${config.apiUrl}/drivers`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+            },
+        };
+        return axios(requestOptions)
+            .then(response => {
+                return response.data;
+            });
     }
 }

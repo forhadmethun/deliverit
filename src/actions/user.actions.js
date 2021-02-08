@@ -39,7 +39,7 @@ const register = (user) => async dispatch => {
         const response = await userService.register(user);
         dispatch({
             type: userConstants.REGISTER_SUCCESS,
-            payload: {}
+            payload: {...response}
         });
         history.push('/');
         dispatch(alertActions.success('Registration successful'));
@@ -52,6 +52,18 @@ const register = (user) => async dispatch => {
     }
 };
 
+const findAllDrivers = () => async dispatch => {
+    try {
+        const response = await userService.findAllDrivers();
+        dispatch({
+            type: userConstants.USER_FIND_SUCCESS,
+            payload: response
+        });
+    } catch (error) {
+        dispatch(alertActions.error(apiError(error)));
+    }
+};
+
 function logout() {
     userService.logout();
     return {type: userConstants.LOGOUT};
@@ -60,5 +72,6 @@ function logout() {
 export const userActions = {
     login,
     logout,
-    register
+    register,
+    findAllDrivers,
 };

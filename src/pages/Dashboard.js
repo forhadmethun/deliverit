@@ -6,6 +6,7 @@ import $ from "jquery";
 
 function Dashboard() {
     const order = useSelector(state => state.order);
+    const user = useSelector(state => state.user);
     const dispatch = useDispatch();
     const [orderNumber, setOrderNumber] = useState('');
     const [customerName, setCustomerName] = useState('');
@@ -13,17 +14,29 @@ function Dashboard() {
     const [mobileNo, setMobileNo] = useState('');
     const [address, setAddress] = useState('');
     const [items, setItems] = useState('');
+    const [driverName, setDriverName] = useState('');
+    const [password, setPassword] = useState('');
+    const [rePassword, setRePassword] = useState('');
 
     useEffect(() => {
         dispatch(orderActions.findAll());
+        dispatch(userActions.findAllDrivers());
     }, []);
 
-    if ( order?.type == "ORDER_ADD_SUCCESS" ){
+    useEffect(() => {
+    if (
+        order?.type == "ORDER_ADD_SUCCESS" ||
+        user?.type == "USERS_REGISTER_SUCCESS"
+
+    ){
         $('.modal-body').find('form')[0].reset();
         $('#exampleModal').hide();
+        $('#driverModal').hide();
         $('.modal-backdrop').hide();
         dispatch(orderActions.findAll());
+        dispatch(userActions.findAllDrivers());
     }
+    }, [order?.type, user?.type]);
 
     const addOrder = () => {
         dispatch(orderActions.add(
@@ -40,6 +53,19 @@ function Dashboard() {
                         "description": items,
                     }
                 ]
+            }
+        ));
+    };
+
+    const addDriver = () => {
+        dispatch(userActions.register(
+            {
+                "name" : driverName,
+                "email": email,
+                "mobileNo" : mobileNo,
+                "isValid": true,
+                "password" : password,
+                "userType" : "DRIVER"
             }
         ));
     };
@@ -103,7 +129,6 @@ function Dashboard() {
                                                             onChange={e => setEmail(e.target.value)}
                                                         />
                                                     </div>
-
                                                     <div className="form-group mb-5">
                                                         <input
                                                             className="form-control h-auto form-control-solid py-4 px-8"
@@ -114,7 +139,6 @@ function Dashboard() {
                                                             onChange={e => setMobileNo(e.target.value)}
                                                         />
                                                     </div>
-
                                                     <div className="form-group mb-5">
                                                         <input
                                                             className="form-control h-auto form-control-solid py-4 px-8"
@@ -125,7 +149,6 @@ function Dashboard() {
                                                             onChange={e => setAddress(e.target.value)}
                                                         />
                                                     </div>
-
                                                     <div className="form-group mb-5">
                                                         <input
                                                             className="form-control h-auto form-control-solid py-4 px-8"
@@ -136,8 +159,6 @@ function Dashboard() {
                                                             onChange={e => setItems(e.target.value)}
                                                         />
                                                     </div>
-
-
                                                 </form>
                                             </div>
                                             <div class="modal-footer">
@@ -297,69 +318,124 @@ function Dashboard() {
                         <div class="card-header border-0">
                             <h3 class="card-title font-weight-bolder text-dark">Drivers</h3>
                             <div class="card-toolbar">
-                                <span className="btn btn-light-primary font-weight-bold ml-2">Add Driver</span>
+                                <span className="btn btn-light-primary font-weight-bold ml-2" data-toggle="modal" data-target="#driverModal">Add Driver</span>
+                            </div>
+                            <div className="modal fade" id="driverModal" tabIndex="-1" role="dialog"
+                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div className="modal-dialog" role="document">
+                                    <div className="modal-content">
+                                        <div className="modal-header">
+                                            <h5 className="modal-title" id="exampleModalLabel">New Driver</h5>
+                                            <button type="button" className="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                <i aria-hidden="true" className="ki ki-close"></i>
+                                            </button>
+                                        </div>
+                                        <div className="modal-body">
+                                            <form className="form" id="kt_login_signin_form">
+                                                <div className="form-group mb-5">
+                                                    <input
+                                                        className="form-control h-auto form-control-solid py-4 px-8"
+                                                        type="text"
+                                                        placeholder="Driver name"
+                                                        name="driverName"
+                                                        autoComplete="off"
+                                                        value={driverName}
+                                                        onChange={e => setDriverName(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="form-group mb-5">
+                                                    <input
+                                                        className="form-control h-auto form-control-solid py-4 px-8"
+                                                        type="text"
+                                                        placeholder="Email address"
+                                                        name="email"
+                                                        autoComplete="off"
+                                                        value={email}
+                                                        onChange={e => setEmail(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="form-group mb-5">
+                                                    <input
+                                                        className="form-control h-auto form-control-solid py-4 px-8"
+                                                        type="text"
+                                                        placeholder="Mobile No."
+                                                        name="mobile"
+                                                        autoComplete="off"
+
+                                                        value={mobileNo}
+                                                        onChange={e => setMobileNo(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="form-group mb-5">
+                                                    <input
+                                                        className="form-control h-auto form-control-solid py-4 px-8"
+                                                        type="password"
+                                                        placeholder="Password"
+                                                        name="password"
+                                                        value={password}
+                                                        onChange={e => setPassword(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="form-group mb-5">
+                                                    <input
+                                                        className="form-control h-auto form-control-solid py-4 px-8"
+                                                        type="password"
+                                                        placeholder="Confirm Password"
+                                                        name="cpassword"
+
+                                                        value={rePassword}
+                                                        onChange={e => setRePassword(e.target.value)}
+                                                    />
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div className="modal-footer">
+                                            <button type="button" className="btn btn-light-primary font-weight-bold"
+                                                    data-dismiss="modal">Close
+                                            </button>
+                                            <button type="button" className="btn btn-primary font-weight-bold"
+                                                    onClick={() => addDriver()}
+                                            >Save changes
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {/*end::Header*/}
                         {/*begin::Body*/}
                         <div class="card-body pt-2">
-                            {/*begin::Item*/}
-                            <div class="d-flex align-items-center mb-10">
-                                {/*begin::Symbol*/}
-                                <div class="symbol symbol-40 symbol-light-success mr-5">
-														<span class="symbol-label">
-															<img
-                                                                src="https://preview.keenthemes.com/metronic/theme/html/demo1/dist/assets/media/svg/avatars/009-boy-4.svg"
-                                                                class="h-75 align-self-end" alt=""/>
-														</span>
+
+                            { user?.type === "USER_FIND_SUCCESS" && user?.message.map(m => {
+
+                               return <div class="d-flex align-items-center mb-10">
+                                    <div class="symbol symbol-40 symbol-light-success mr-5">
+                                                            <span class="symbol-label">
+                                                                <img
+                                                                    src="https://preview.keenthemes.com/metronic/theme/html/demo1/dist/assets/media/svg/avatars/009-boy-4.svg"
+                                                                    class="h-75 align-self-end" alt=""/>
+                                                            </span>
+                                    </div>
+                                    <div class="d-flex flex-column flex-grow-1 font-weight-bold">
+                                        <a href="#" class="text-dark text-hover-primary mb-1 font-size-lg">
+                                            {m?.name}
+                                        </a>
+                                        <span class="text-muted"><span
+                                            className="label label-xl label-inline label-light-success">{m?.mobileNo}</span></span>
+                                    </div>
+                                    <div class="dropdown dropdown-inline ml-2" data-toggle="tooltip" title=""
+                                         data-placement="left" data-original-title="Quick actions">
+                                        <a href="#" class="btn btn-hover-light-primary btn-sm btn-icon"
+                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="ki ki-bold-more-hor"></i>
+                                        </a>
+                                        <div class="dropdown-menu p-0 m-0 dropdown-menu-md dropdown-menu-right"></div>
+                                    </div>
                                 </div>
-                                {/*end::Symbol*/}
-                                {/*begin::Text*/}
-                                <div class="d-flex flex-column flex-grow-1 font-weight-bold">
-                                    <a href="#" class="text-dark text-hover-primary mb-1 font-size-lg">Ricky Hunt</a>
-                                    <span class="text-muted"><span className="label label-xl label-inline label-light-success">Active</span></span>
-                                </div>
-                                {/*end::Text*/}
-                                {/*begin::Dropdown*/}
-                                <div class="dropdown dropdown-inline ml-2" data-toggle="tooltip" title=""
-                                     data-placement="left" data-original-title="Quick actions">
-                                    <a href="#" class="btn btn-hover-light-primary btn-sm btn-icon"
-                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="ki ki-bold-more-hor"></i>
-                                    </a>
-                                    <div class="dropdown-menu p-0 m-0 dropdown-menu-md dropdown-menu-right"></div>
-                                </div>
-                                {/*end::Dropdown*/}
-                            </div>
-                            {/*end::Item*/}
-                            {/*begin::Item*/}
-                            <div class="d-flex align-items-center mb-10">
-                                {/*begin::Symbol*/}
-                                <div class="symbol symbol-40 symbol-light-success mr-5">
-														<span class="symbol-label">
-															<img
-                                                                src="https://preview.keenthemes.com/metronic/theme/html/demo1/dist/assets/media/svg/avatars/006-girl-3.svg"
-                                                                class="h-75 align-self-end" alt=""/>
-														</span>
-                                </div>
-                                {/*end::Symbol*/}
-                                {/*begin::Text*/}
-                                <div class="d-flex flex-column flex-grow-1 font-weight-bold">
-                                    <a href="#" class="text-dark text-hover-primary mb-1 font-size-lg">Anne Clarc</a>
-                                    <span class="text-muted"><span className="label label-xl label-inline label-light-danger">Offline</span></span>
-                                </div>
-                                {/*end::Text*/}
-                                {/*begin::Dropdown*/}
-                                <div class="dropdown dropdown-inline ml-2" data-toggle="tooltip" title=""
-                                     data-placement="left" data-original-title="Quick actions">
-                                    <a href="#" class="btn btn-hover-light-primary btn-sm btn-icon"
-                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="ki ki-bold-more-hor"></i>
-                                    </a>
-                                </div>
-                                {/*end::Dropdown*/}
-                            </div>
-                            {/*end::Item*/}
+
+                            })}
+
                         </div>
                         {/*end::Body*/}
                     </div>
